@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChurnGuard — Customer Retention Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="/" class="brand">
+        <span class="brand-badge">CG</span>
+        <div>
+          <h1>ChurnGuard</h1>
+          <p class="subtitle">Customer Churn &amp; Retention Intelligence</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="active">Single &amp; Batch Scoring</a>
+        <a href="#batch">Batch CSV</a>
+        <a href="/dashboard">Model Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero-banner">
+      <div>
+        <span class="eyebrow">Profit-Optimized Retention Engine</span>
+        <h2>Identify at-risk customers before they leave — and know exactly why.</h2>
+        <p>Powered by XGBoost &amp; SHAP explainability, tuned on cross-validated retention ROI rather than raw accuracy.</p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" id="fill-high-risk" class="btn btn-danger-soft">Load High-Risk Sample</button>
+        <button type="button" id="fill-low-risk" class="btn btn-success-soft">Load Low-Risk Sample</button>
+      </div>
+    </section>
+
+    <div class="workspace-grid">
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <h3>Customer Profile</h3>
+            <p class="muted-text">Configure account, service, and billing details to compute live churn probability.</p>
+          </div>
+          <button type="button" id="reset-form" class="btn btn-ghost btn-sm">Reset</button>
+        </div>
+
+        <form id="predict-form" class="form-grid">
+          {% for field, options in choices.items() %}
+            <label class="field">
+              <span>{{ field }}</span>
+              <select name="{{ field }}">
+                {% for opt in options %}
+                  <option value="{{ opt }}">{{ opt }}</option>
+                {% endfor %}
+              </select>
+            </label>
+          {% endfor %}
+
+          {% for field in numeric %}
+            <label class="field">
+              <span>{{ field }}</span>
+              <input type="number" step="0.01" min="0" name="{{ field }}" placeholder="0.00" required>
+            </label>
+          {% endfor %}
+
+          <div class="form-footer">
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg">
+              <span>Analyze Churn Risk</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="sticky-panel">
+        <section class="card result-card">
+          <div class="card-header">
+            <div>
+              <h3>Risk Assessment</h3>
+              <p class="muted-text">Real-time probability &amp; SHAP feature drivers</p>
+            </div>
+          </div>
+
+          <div id="result" class="result-body" aria-live="polite">
+            <div class="empty-state">
+              <div class="empty-icon">📊</div>
+              <h4>Ready to score</h4>
+              <p>Fill out the customer profile or click <strong>Load High-Risk Sample</strong> to see churn probability, recommended action, and top drivers.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="batch">
+          <div class="card-header">
+            <div>
+              <h3>Batch CSV Scoring</h3>
+              <p class="muted-text">Upload a customer CSV to download a ranked retention action list.</p>
+            </div>
+          </div>
+
+          <form action="/batch" method="post" enctype="multipart/form-data" class="batch-form">
+            <label class="dropzone" id="dropzone">
+              <input type="file" name="file" id="batch-file" accept=".csv" required>
+              <span class="dropzone-icon">📁</span>
+              <strong id="file-label">Choose a CSV file or drag it here</strong>
+              <span class="muted-text">Must match Telco dataset feature columns</span>
+            </label>
+            <button type="submit" class="btn btn-dark btn-full">Score &amp; Download Ranked CSV</button>
+          </form>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

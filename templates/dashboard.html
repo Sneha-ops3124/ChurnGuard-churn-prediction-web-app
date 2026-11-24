@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChurnGuard — Model Performance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="/" class="brand">
+        <span class="brand-badge">CG</span>
+        <div>
+          <h1>ChurnGuard</h1>
+          <p class="subtitle">Model Benchmarks &amp; Global Explainability</p>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Single &amp; Batch Scoring</a>
+        <a href="/dashboard" class="active">Model Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="kpi-strip">
+      <div class="kpi-card">
+        <span class="kpi-label">Optimal Decision Threshold</span>
+        <strong class="kpi-value">{{ threshold }}</strong>
+        <span class="kpi-note">Selected via out-of-fold CV to maximize retention profit</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Deployed Production Model</span>
+        <strong class="kpi-value">XGBoost</strong>
+        <span class="kpi-note">Paired with SHAP TreeExplainer for per-customer drivers</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Validation Protocol</span>
+        <strong class="kpi-value">Leakage-Safe</strong>
+        <span class="kpi-note">5-fold stratified CV; held-out test set evaluated once</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Model Comparison (Held-Out Test Set)</h2>
+          <p class="muted-text">Evaluated on imbalanced classification metrics and simulated net profit (USD) rather than raw accuracy.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Threshold</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1 Score</th>
+              <th>ROC-AUC</th>
+              <th>PR-AUC</th>
+              <th>Simulated Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name, m in metrics.items() %}
+              <tr class="{{ 'row-highlight' if name == 'XGBoost' else '' }}">
+                <td>
+                  <div class="model-cell">
+                    <strong>{{ name }}</strong>
+                    {% if name == 'XGBoost' %}
+                      <span class="pill-deployed">Deployed</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>{{ m.threshold }}</td>
+                <td>{{ m.precision }}</td>
+                <td>{{ m.recall }}</td>
+                <td>{{ m.f1 }}</td>
+                <td>{{ m.roc_auc }}</td>
+                <td>{{ m.pr_auc }}</td>
+                <td class="profit-cell">${{ "{:,.0f}".format(m.profit_test) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <h2>Global Churn Drivers (SHAP Summary)</h2>
+          <p class="muted-text">Each dot represents a customer. Red indicates higher feature values, blue indicates lower values, and points further right increase churn risk.</p>
+        </div>
+      </div>
+
+      <div class="chart-frame">
+        <img src="{{ url_for('static', filename='shap_summary.png') }}" alt="SHAP summary plot" class="wide">
+      </div>
+    </section>
+  </main>
+</body>
+</html>

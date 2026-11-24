@@ -1,0 +1,32 @@
+{
+  "Logistic Regression": {
+    "threshold": 0.32,
+    "cv_pr_auc": 0.655,
+    "precision": 0.437,
+    "recall": 0.92,
+    "f1": 0.593,
+    "roc_auc": 0.842,
+    "pr_auc": 0.632,
+    "profit_test": 35860.0
+  },
+  "Random Forest": {
+    "threshold": 0.29,
+    "cv_pr_auc": 0.651,
+    "precision": 0.433,
+    "recall": 0.901,
+    "f1": 0.585,
+    "roc_auc": 0.84,
+    "pr_auc": 0.649,
+    "profit_test": 34990.0
+  },
+  "XGBoost": {
+    "threshold": 0.15,
+    "cv_pr_auc": 0.656,
+    "precision": 0.382,
+    "recall": 0.949,
+    "f1": 0.545,
+    "roc_auc": 0.84,
+    "pr_auc": 0.649,
+    "profit_test": 34670.0
+  }
+}
